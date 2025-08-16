@@ -564,6 +564,51 @@ function setupCommandHandlers(socket, number) {
                     });
                     break;
                 }
+case 'ai': {
+    if (!text) return reply("⚠️ කරුණාකර ප්‍රශ්නයක් type කරන්න.\n\nඋදා: .ai හෙලෝ");
+
+    try {
+        // Simple AI reply (without API - offline response)
+        let replies = [
+            "හ්ම්... මට හිතෙනවා ඔයාගේ ප්‍රශ්නය deep 😅",
+            "ඔයාගෙ idea එක හොඳයි 👍",
+            "එක හරිම interesting එකක්... 💡",
+            "මම හිතනවා ඔයාට motivation අවශ්‍යයි ❤️",
+            "එකට තවත් දේවල් කියලා බලන්න 🚀"
+        ];
+
+        let ans = replies[Math.floor(Math.random() * replies.length)];
+        reply(ans);
+
+    } catch (e) {
+        console.log(e);
+        reply("❌ AI case එක error එකක් දාලා 😔");
+    }
+}
+break;
+
+     case 'kick': {
+    if (!isGroup) return reply("❌ මේ command එක group වලට විතරයි!");
+    if (!isBotAdmins) return reply("❌ Bot එකට admin rights නෑ!");
+    if (!isAdmins) return reply("❌ ඔයා admin නෙවෙයි!");
+
+    let users = m.mentionedJid[0] ? m.mentionedJid : m.quoted ? [m.quoted.sender] : [];
+    if (!users[0]) return reply("⚠️ Kick කරන්න member mention කරන්න හෝ reply කරන්න!");
+
+    try {
+        await conn.groupParticipantsUpdate(
+            m.chat,
+            [users[0]],
+            "remove"
+        );
+        reply("✅ User kicked successfully!");
+    } catch (e) {
+        console.log(e);
+        reply("❌ Kick කරන්න බැරි උනා.");
+    }
+}
+break;
+                    
 //=======================================
 case 'menu': {
     const startTime = socketCreationTime.get(number) || Date.now();
@@ -595,57 +640,54 @@ case 'menu': {
             rows: [
                 { title: "BOT INFO", description: "Show bot information", rowId: `${config.PREFIX}alive` },
                 { title: "SYSTEM", description: "Show system details", rowId: `${config.PREFIX}system` },
-                { title: "PING", description: "Check bot latency", rowId: `${config.PREFIX}ping` }
-            ]
-        },
-        {
-            title: "🫩 ᴍᴇᴅɪᴀ ᴅᴏᴡɴʟᴏᴅ 🫩",
-            rows: [
-                { title: "SONG 🎧", description: "Download audio from YouTube", rowId: `${config.PREFIX}song` },
-                { title: "VIDEO 📹", description: "Download video from YouTube", rowId: `${config.PREFIX}video` }
-            ]
-        },
-        {
-            title: "🫩 ᴠɪᴇᴡ ᴏɴᴄᴇ ʜᴀɴᴅʟᴇʀ 🫩",
-            rows: [
-                { title: "👁‍🗨 Vɪᴇᴡ Oɴᴄᴇ", description: "Capture view-once messages", rowId: `${config.PREFIX}vv` }
-            ]
-        },
-        {
-            title: "🫩 ᴏᴛʜᴇʀ ᴄᴏᴍᴍᴀɴᴅ 🫩",
-            rows: [
-                { title: "OWNER 👨‍💻", description: "Contact bot owner", rowId: `${config.PREFIX}owner` },
-                { title: "SETTING 📌", description: "Change bot settings", rowId: `${config.PREFIX}preferences` },
-                { title: "CHANNEL 🌝", description: "Get our channel link", rowId: `${config.PREFIX}channel` }
-            ]
-        }
+case 'menu': {
+    const startTime = socketCreationTime.get(number) || Date.now();
+    const uptime = Math.floor((Date.now() - startTime) / 1000);
+    const hours = Math.floor(uptime / 3600);
+    const minutes = Math.floor((uptime % 3600) / 60);
+    const seconds = Math.floor(uptime % 60);
+
+    await socket.sendMessage(sender, { 
+        react: { 
+            text: "🃏",
+            key: msg.key 
+        } 
+    });
+
+    const title = '𝙽𝙴𝚃𝙷𝚄𝚆𝙷 𝚇𝙼𝙳 𝙼𝙸𝙽𝙸 𝙱𝙾𝚃 V1 📌';
+    const text = `╭──➢\n` +
+        `│ \`S T A T U S\`\n` +
+        `│ *⦁ ʙᴏᴛ ɴᴀᴍᴇ*: 𝙽𝙴𝚃𝙷𝚄𝚆𝙷 𝚇𝙼𝙳 𝙼𝙸𝙽𝙸 𝙱𝙾𝚃\n` +
+        `│ *⦁ ʙᴏᴛ ᴏᴡɴᴇʀ*: 𝙽𝙴𝚃𝙷𝚄𝚆𝙷\n` +
+        `│ *⦁ ᴠᴇʀꜱɪᴏɴ*: 0.0001+\n` +
+        `│ *⦁ ᴘʟᴀᴛꜰᴏʀᴍ*: Heroku\n` +
+        `│ *⦁ ᴜᴘᴛɪᴍᴇ*: ${hours}h ${minutes}m ${seconds}s\n` +
+        `╰──➢`;
+
+    const buttons = [
+        { buttonId: `${config.PREFIX}alive`, buttonText: { displayText: "Alive ✅" }, type: 1 },
+        { buttonId: `${config.PREFIX}menu`, buttonText: { displayText: "Menu 🎭" }, type: 1 },
+        { buttonId: `${config.PREFIX}ig`, buttonText: { displayText: "Instagram 📷" }, type: 1 },
+        { buttonId: `${config.PREFIX}song`, buttonText: { displayText: "Song 🎧" }, type: 1 },
+        { buttonId: `${config.PREFIX}vv`, buttonText: { displayText: "ViewOnce 👁‍🗨" }, type: 1 },
+        { buttonId: `${config.PREFIX}system`, buttonText: { displayText: "System ⚙️" }, type: 1 },
+        { buttonId: `${config.PREFIX}setting`, buttonText: { displayText: "Setting 📌" }, type: 1 },
+        { buttonId: `${config.PREFIX}owner`, buttonText: { displayText: "Owner 👨‍💻" }, type: 1 },
+        { buttonId: `${config.PREFIX}jid`, buttonText: { displayText: "My JID 🔑" }, type: 1 },
+        { buttonId: `${config.PREFIX}kick`, buttonText: { displayText: "Group Kick 🚫" }, type: 1 }
     ];
 
-    await socket.sendMessage(sender, {
+    const buttonMessage = {
         image: { url: config.BUTTON_IMAGES.MENU },
-        text: text,
+        caption: text,
         footer: config.BOT_FOOTER,
-        title: title,
-        buttonText: "𝘚𝘌𝘓𝘌𝘊𝘛 𝘉𝘖𝘛𝘛𝘖𝘕 🎭",
-        sections: sections
-    });
-    break;
-}
-//=======================================
-                case 'ping': {     
-                    var inital = new Date().getTime();
-                    let ping = await socket.sendMessage(sender, { text: '*_Pinging to NETHUWH XMD 🃏 Module..._* ❗' });
-                    var final = new Date().getTime();
-                    await socket.sendMessage(sender, { text: '《 █▒▒▒▒▒▒▒▒▒▒▒》10%', edit: ping.key });
-                    await socket.sendMessage(sender, { text: '《 ████▒▒▒▒▒▒▒▒》30%', edit: ping.key });
-                    await socket.sendMessage(sender, { text: '《 ███████▒▒▒▒▒》50%', edit: ping.key });
-                    await socket.sendMessage(sender, { text: '《 ██████████▒▒》80%', edit: ping.key });
-                    await socket.sendMessage(sender, { text: '《 ████████████》100%', edit: ping.key });
+        buttons: buttons,
+        headerType: 4
+    };
 
-                    return await socket.sendMessage(sender, {
-                        text: '*Pong '+ (final - inital) + ' Ms*', edit: ping.key });
-                    break;
-                }
+    await socket.sendMessage(sender, buttonMessage);
+}
+break;
                 
                 // OWNER COMMAND WITH VCARD
                 case 'owner': {
